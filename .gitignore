@@ -1,0 +1,9 @@
+# Node / app artifacts
+node_modules/
+
+# Local database file and data directory
+/data/
+bot.db
+
+# Environment files
+.env
