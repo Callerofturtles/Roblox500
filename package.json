@@ -4,8 +4,7 @@
   "description": "Roblox 16+ Launch Network Discord Bot",
   "main": "index.js",
   "scripts": {
-    "prestart": "npm ci",
-    "start": "node index.js",
+    "start": "npm ci && node index.js",
     "dev": "node --watch index.js",
     "deploy": "node deploy-commands.js"
   },
