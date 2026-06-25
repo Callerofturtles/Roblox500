@@ -88,7 +88,7 @@ module.exports = {
   },
 
   dashboard: {
-    port: parseInt(process.env.DASHBOARD_PORT) || 3000,
+    port: parseInt(process.env.PORT) || parseInt(process.env.DASHBOARD_PORT) || 3000,
     secret: process.env.DASHBOARD_SECRET || 'changeme',
   },
 };

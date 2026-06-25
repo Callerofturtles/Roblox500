@@ -1,6 +1,6 @@
 const express = require('express');
-const { db } = require('../database/db');
-const config = require('../config');
+const db = require('./database/db'); // use helper functions: db.get, db.all, etc.
+const config = require('./config');
 
 const app = express();
 app.use(express.json());
@@ -14,31 +14,31 @@ app.use('/api', (req, res, next) => {
 });
 
 app.get('/api/stats', (req, res) => {
-  const users = db.prepare('SELECT COUNT(*) as cnt FROM users').get().cnt;
-  const sessions = db.prepare('SELECT COUNT(*) as cnt FROM sessions').get().cnt;
-  const activeSessions = db.prepare('SELECT COUNT(*) as cnt FROM sessions WHERE status = ?').get('open').cnt;
-  const tickets = db.prepare('SELECT COUNT(*) as cnt FROM tickets WHERE status = ?').get('open').cnt;
-  const topUsers = db.prepare('SELECT id, xp, level, tokens FROM users ORDER BY xp DESC LIMIT 5').all();
+  const users = (db.get('SELECT COUNT(*) as cnt FROM users') || {}).cnt || 0;
+  const sessions = (db.get('SELECT COUNT(*) as cnt FROM sessions') || {}).cnt || 0;
+  const activeSessions = (db.get('SELECT COUNT(*) as cnt FROM sessions WHERE status = ?', ['open']) || {}).cnt || 0;
+  const tickets = (db.get('SELECT COUNT(*) as cnt FROM tickets WHERE status = ?', ['open']) || {}).cnt || 0;
+  const topUsers = db.all('SELECT id, xp, level, tokens FROM users ORDER BY xp DESC LIMIT 5');
   res.json({ users, sessions, activeSessions, tickets, topUsers });
 });
 
 app.get('/api/sessions', (req, res) => {
-  const sessions = db.prepare('SELECT * FROM sessions ORDER BY created_at DESC LIMIT 20').all();
+  const sessions = db.all('SELECT * FROM sessions ORDER BY created_at DESC LIMIT 20');
   res.json(sessions);
 });
 
 app.get('/api/modlogs', (req, res) => {
-  const logs = db.prepare('SELECT * FROM moderation ORDER BY created_at DESC LIMIT 50').all();
+  const logs = db.all('SELECT * FROM moderation ORDER BY created_at DESC LIMIT 50');
   res.json(logs);
 });
 
 app.get('/api/games', (req, res) => {
-  const games = db.prepare('SELECT * FROM games ORDER BY votes_up DESC LIMIT 20').all();
+  const games = db.all('SELECT * FROM games ORDER BY votes_up DESC LIMIT 20');
   res.json(games);
 });
 
 app.get('/api/leaderboard', (req, res) => {
-  const users = db.prepare('SELECT id, xp, level, tokens FROM users ORDER BY xp DESC LIMIT 20').all();
+  const users = db.all('SELECT id, xp, level, tokens FROM users ORDER BY xp DESC LIMIT 20');
   res.json(users);
 });
 
@@ -120,8 +120,9 @@ app.get('/', (req, res) => {
 });
 
 function startDashboard() {
-  app.listen(config.dashboard.port, () => {
-    console.log(`[Dashboard] Running on port ${config.dashboard.port}`);
+  const port = parseInt(process.env.PORT) || config.dashboard.port;
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`[Dashboard] Running on port ${port}`);
   });
 }
 
