@@ -2,7 +2,8 @@ const initSqlJs = require('sql.js');
 const fs = require('fs');
 const path = require('path');
 
-const dbDir = path.join(__dirname, '../data');
+// Create data directory inside repository (was ../data previously)
+const dbDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 const dbPath = path.join(dbDir, 'bot.db');
 
@@ -249,7 +250,7 @@ async function init() {
   return { save };
 }
 
-// ── Low-level helpers ──────────────────────────────────────────────────────────
+// ── Low-level helpers ───────────────────────────────────────────────────────
 function run(sql, params = []) {
   db.run(sql, params);
 }
@@ -280,7 +281,7 @@ function lastInsertId() {
   return row ? row.id : null;
 }
 
-// ── User helpers ───────────────────────────────────────────────────────────────
+// ── User helpers ───────────────────────────────────────────────────────────
 function getUser(userId) {
   let user = get('SELECT * FROM users WHERE id = ?', [userId]);
   if (!user) {

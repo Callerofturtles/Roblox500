@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { init: initDB } = require('./database/db');
 const config = require('./config');
+const { startDashboard } = require('./server');
 
 if (!config.token) {
   console.error('[Bot] ❌ BOT_TOKEN is missing. Set it in your environment secrets.');
@@ -85,6 +86,9 @@ async function main() {
     console.error('[Bot] ❌ Login failed:', err.message);
     process.exit(1);
   });
+
+  // start the dashboard web UI (binds to PORT)
+  try { startDashboard(); } catch (e) { console.warn('[Dashboard] Failed to start dashboard:', e.message); }
 }
 
 main().catch(err => {
